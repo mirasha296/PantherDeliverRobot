@@ -1,3 +1,4 @@
+#Python by Timothy Kravets
 #curl -X POST http://localhost:5005/newpackage -H "Content-Type: application/json" -d '{"sender": "Tim", "delivery": "SWR101", "pickup": "SWR100", "recipient" : "Chris"}'
 
 #curl -X POST http://localhost:5005/newpackage -H "Content-Type: application/json" -d '{"sender": "Tim"}'
