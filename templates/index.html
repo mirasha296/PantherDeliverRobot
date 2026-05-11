@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Delivery Control</title>
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
+            margin: 40px; 
+            background-color: #f4f7f6; 
+            color: #333; 
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+        }
+        .section { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        h2 { 
+            color: #2c3e50; 
+            border-bottom: 2px solid #3498db; 
+            padding-bottom: 10px; 
+        }
+        form { 
+            display: grid; 
+            gap: 10px; 
+        }
+        input { 
+            padding: 8px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+        }
+        button { 
+            padding: 10px; 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+        button:hover { 
+            background: #2980b9; 
+        }
+        ul { 
+            list-style: none; 
+            padding: 0; 
+        }
+        li { 
+            padding: 10px; 
+            border-bottom: 1px solid #eee; 
+            font-family: monospace; 
+            font-size: 0.9em; 
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Logistics Control Center</h1>
+
+    <div class="section">
+        <h2>Register New Package</h2>
+        <form id="packageForm" method="POST">
+            <input type="text" id="sender" placeholder="Sender Name" required>
+            <input type="text" id="recipient" placeholder="Recipient Name" required>
+            <input type="text" id="pickup" placeholder="Pickup Location (e.g. SWR 100)" required>
+            <input type="text" id="delivery" placeholder="Delivery Location (e.g. SWR 101)" required>
+            <button type="submit">Send Package</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>Cancel Package</h2>
+        <form id="cancelForm" method="POST">
+            <input type="text" id="idNum" placeholder="Package ID to Cancel" required>
+            <button type="submit">Cancel Package</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>Active Packages</h2>
+        <ul id="packageList">
+            {% for package in packages %}
+                <li>{{ package }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Robot Fleet Status</h2>
+        <ul>
+            {% for robot in robots %}
+                <li>{{ robot }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+<!-- Javascript was helped created with use of AI to assist in establishing a form submission handler  -->
+    <script>
+        document.getElementById('packageForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                sender: document.getElementById('sender').value,
+                recipient: document.getElementById('recipient').value,
+                pickup: document.getElementById('pickup').value,
+                delivery: document.getElementById('delivery').value
+            };
+
+            const response = await fetch('/v1/packages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('Package Registered!');
+                location.reload();
+            } else {
+                alert('Failed to register package.');
+            }
+        });
+            document.getElementById('cancelForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                id: document.getElementById('idNum').value
+            };
+
+            const response = await fetch('/v1/packages/' + data.id, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('Package Cancelled!');
+                location.reload();
+            } else {
+                alert('Failed to cancel package.');
+            }
+        });
+    </script>
+</body>
+</html>
