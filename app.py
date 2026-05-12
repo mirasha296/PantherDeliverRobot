@@ -1,3 +1,4 @@
+#Python by Timothy Kravets
 #curl -X POST http://localhost:5005/newpackage -H "Content-Type: application/json" -d '{"sender": "Tim", "delivery": "SWR101", "pickup": "SWR100", "recipient" : "Chris"}'
 
 #curl -X POST http://localhost:5005/newpackage -H "Content-Type: application/json" -d '{"sender": "Tim"}'
@@ -8,6 +9,7 @@ from flask import jsonify
 import time
 import uuid
 from datetime import datetime
+from flask import render_template
 app = Flask(__name__)
 
 idNum = 0
@@ -56,9 +58,13 @@ deliveries = {}
 robots = [r1, r2, r3]
 packIds = [p1.idNum, p2.idNum, p3.idNum]
 
+# @app.route('/', methods=['GET'])
+# def hello():
+#     return '<h1>Hello!</h1>'
+
 @app.route('/', methods=['GET'])
-def hello():
-    return '<h1>Hello!</h1>'
+def index():  
+    return render_template('index.html', packages=packages, robots=robots)
 
 @app.route('/v1/packages', methods=['POST'])
 def registerPackage():
