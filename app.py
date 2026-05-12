@@ -1,4 +1,3 @@
-#Python by Timothy Kravets
 #curl -X POST http://localhost:5005/newpackage -H "Content-Type: application/json" -d '{"sender": "Tim", "delivery": "SWR101", "pickup": "SWR100", "recipient" : "Chris"}'
 
 #curl -X POST http://localhost:5005/newpackage -H "Content-Type: application/json" -d '{"sender": "Tim"}'
@@ -6,10 +5,9 @@
 from flask import Flask
 from flask import request
 from flask import jsonify
+import time
 import uuid
-from flask import render_template
-
-
+from datetime import datetime
 app = Flask(__name__)
 
 idNum = 0
@@ -59,8 +57,8 @@ robots = [r1, r2, r3]
 packIds = [p1.idNum, p2.idNum, p3.idNum]
 
 @app.route('/', methods=['GET'])
-def index():  
-    return render_template('index.html', packages=packages, robots=robots)
+def hello():
+    return '<h1>Hello!</h1>'
 
 @app.route('/v1/packages', methods=['POST'])
 def registerPackage():
@@ -99,11 +97,6 @@ def registerDelivery():
             return jsonify(response),201
     print("All packages are assigned")
     return jsonify(response),201
-
-@app.route('/', methods=['GET'])
-def hello():
-    # Passing the existing lists to the template
-    return render_template('index.html', packages=packages, robots=robots)
 
 @app.route('/v1/packages', methods=['GET'])
 def allPackages():
@@ -196,7 +189,37 @@ def findDeliveryStatus(packId):
 
 @app.route('/v1/robots', methods=['POST'])
 def deliver():
-    delivery = next(iter(deliveries.values()))
+    response = " "
+    robotId = next(iter(deliveries.values()))
+    packageId = " "
+    for key, value in deliveries.items():
+        if value == robotId:
+            packageId = key
+    deliveries.pop(packageId)
+    try:
+        for i in range(0, len(robots)):
+            if (robotId == robots[i].idNum):
+                pickupTime = datetime.now()
+                print("Package " + packageId + " was picked up at", pickupTime)
+                robots[i].status == "IN_TRANSIT"
+                time.sleep(10)
+                deliveryTime = datetime.now()
+                print("Package " + packageId + " was deliveried at", deliveryTime)
+                robots[i].status == "DELIVERED"
+                time.sleep(3)
+            for i in range(0, len(packages)):
+                if (packageId == packages[i].idNum):
+                    packages.pop(i)
+                    robots[i].status == "available"
+                    break
+
+            response = {"Robot ID: " : robotId, "Package ID" : packageId, "Delivery Status" : "DELIVERED"}
+    except Exception as e:
+        print(e)
+        deliveries[packageId] = robotId
+        response = "Issue with Delivery"
+
+    return jsonify(response), 200
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', port=5005, debug=True)
